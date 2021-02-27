@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 
 html {
     scroll-behavior: smooth;
@@ -8,66 +8,66 @@ body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Montserrat', 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-family: "Montserrat", "Gill Sans", "Gill Sans MT", Calibri,
+        "Trebuchet MS", sans-serif;
     background: #000;
 }
 
-#canvas {
+canvas {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: -1;
 }
 
-.miniScore {
-    color: white;
-}
-
-span {
+.minScore {
+    position: relative;
     user-select: none;
 }
 
-.scoreBoard {
-    position: absolute;
+div span {
+    color: white;
+}
+
+.bigScore {
+    user-select: none;
+    position: fixed;
     top: 50%;
     left: 50%;
-    color: black;
-    text-align: center;
     width: 50%;
     height: 250px;
-    background: #ffffff;
+    border-radius: 20px;
+    border: 5px solid #ccc;
+    background: white;
     font-size: 2em;
+    text-align: center;
     transform: translate(-50%, -50%) scale(0);
-    z-index: -11;
+    z-index: -1000;
+    transition: 0.5s ease-in-out;
     opacity: 0;
-    transition: .4s;
 }
 
-.scoreBoard.shown {
-    transform: translate(-50%, -50%) scale(1);
+.bigScore.shown {
     opacity: 1;
-    z-index: 1;
+    transform: translate(-50%, -50%) scale(1);
+    z-index: 1000;
 }
 
-.scoreBoard h1 {
-    margin: 0;
+.bigScore h1 {
+    margin: 0%;
 }
 
-.scoreBoard button {
+.bigScore button {
     width: 70%;
-    height: 50px;
-    padding: 0 10px;
-    background: #14e2d9;
-    border-radius: 500px;
+    height: 45px;
+    border-radius: 45px;
     outline: none;
     border: none;
-    font-size: 35px;
-    font-weight: bold;
-    color: white;
-    transition: .3s;
-    cursor: pointer;
+    background: aqua;
+    font-size: 30px;
+    font-weight: 900;
+    transition: 0.25s;
 }
 
-.scoreBoard button:hover {
+.bigScore button:hover {
     background: dodgerblue;
 }
