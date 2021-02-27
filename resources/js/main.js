@@ -1,15 +1,23 @@
+// Inspired by CRISS COURSE
+// Link: https://www.youtube.com/watch?v=eI9idPTT0c4
+
 // Get canvas
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+// Set a score to local storage.
+if (!localStorage.getItem("maxScore")) {
+    localStorage.setItem("maxScore", 0);
+}
 // Get necessary elements
 let score = 0;
-const scoreEl = document.getElementById("score");
-const finalScore = document.getElementById("finalScore");
-const scoreBoard = document.querySelector(".scoreBoard");
-const button = document.querySelector("button");
+let maxScore;
+const minScore = document.getElementById("minScore"),
+    bigScore = document.getElementById("bigScore"),
+    button = document.querySelector("button"),
+    highScore = document.getElementById("highScore");
 
 // Create sufficient arrays.
 let projectiles = [];
@@ -106,35 +114,48 @@ class Particle {
 // Make random enemies
 function spawnEnemy() {
     // make enemy come from random place
-    setInterval(() => {
-        const radius = Math.random() * 24 + 6;
-        let x, y;
-        if (Math.random() < 0.5) {
-            x = Math.random() < 0.5 ? 0 - radius : canvas.width + radius;
-            y = Math.random() * canvas.height;
-        } else {
-            x = Math.random() * canvas.width;
-            y = Math.random() < 0.5 ? 0 - radius : canvas.height + radius;
-        }
+    const radius = Math.random() * 24 + 6;
+    let x, y;
+    if (Math.random() < 0.5) {
+        x = Math.random() < 0.5 ? 0 - radius : canvas.width + radius;
+        y = Math.random() * canvas.height;
+    } else {
+        x = Math.random() * canvas.width;
+        y = Math.random() < 0.5 ? 0 - radius : canvas.height + radius;
+    }
 
-        const color = `hsl(${Math.floor(Math.random() * 360)}, 50%, 50%)`;
-        const angle = Math.atan2(canvas.height / 2 - y, canvas.width / 2 - x);
+    const color = `hsl(${Math.floor(Math.random() * 360)}, 50%, 50%)`;
+    const angle = Math.atan2(canvas.height / 2 - y, canvas.width / 2 - x);
 
-        const velocity = {
-            x: Math.cos(angle),
-            y: Math.sin(angle)
-        };
-        enemies.push(new Enemy(x, y, radius, color, velocity));
-    }, 1000);
+    const velocity = {
+        x: Math.cos(angle),
+        y: Math.sin(angle),
+    };
+    enemies.push(new Enemy(x, y, radius, color, velocity));
 }
 
 // Make player and draw it.
 let player = new Player(canvas.width / 2, canvas.height / 2, 15, "white");
 player.draw();
 
+let gameSpeed = 0;
+let spawnTimer = 60;        // Spawning enemy timer.
 // Make a variable named 'animateId' so that animation can be removable.
 let animateId;
 function animate() {
+    spawnTimer--;
+
+    // Set a interval for making enemy.
+    if (spawnTimer < 0) {
+        spawnEnemy();
+        gameSpeed += 1;
+        console.log(gameSpeed);
+        if (gameSpeed >= 30) {      // Fixing The Ultimate Game Speed.
+            gameSpeed = 30;
+        }
+        spawnTimer = 60 - gameSpeed;
+    }
+
     animateId = requestAnimationFrame(animate);
 
     // Make smooth effects on any object.
@@ -177,9 +198,22 @@ function animate() {
         let distance = Math.hypot(player.x - enemy.x, player.y - enemy.y);
         if (distance - player.radius - enemy.radius < 1) {
             // Cancel the animation by removing the animateId.
+            bigScore.parentNode.classList.toggle("shown");
+            bigScore.textContent = score;
+
+            // Get Local storage value.
+            maxScore =
+                localStorage.getItem("maxScore") != "0"
+                    ? localStorage.getItem("maxScore")
+                    : 0;
+            highScore.textContent = maxScore;
+
+            // If user new score is greater then previous score, Score updates.
+            if (maxScore < score) {
+                maxScore = score;
+                localStorage.setItem("maxScore", maxScore);
+            }
             cancelAnimationFrame(animateId);
-            scoreBoard.classList.toggle("shown");
-            finalScore.textContent = score;
         }
 
         // If Projectiles hit enemy, enemy and particles will be removed.
@@ -205,7 +239,7 @@ function animate() {
                                     (Math.random() * 5),
                                 y:
                                     (Math.random() * 1 - 0.5) *
-                                    (Math.random() * 5)
+                                    (Math.random() * 5),
                             }
                         )
                     );
@@ -214,13 +248,13 @@ function animate() {
                 // If the radius of enemy becomes less than 20
                 if (enemy.radius - 10 > 10) {
                     score += 250;
-                    scoreEl.textContent = score;
+                    minScore.textContent = score;
 
                     enemy.radius -= 10;
                     projectiles.splice(projectileIndex, 1);
                 } else {
                     score += 100;
-                    scoreEl.textContent = score;
+                    minScore.textContent = score;
                     enemies.splice(index, 1);
                     projectiles.splice(projectileIndex, 1);
                 }
@@ -237,7 +271,7 @@ window.addEventListener("click", (e) => {
     );
     const velocity = {
         x: Math.cos(angle) * 5,
-        y: Math.sin(angle) * 5
+        y: Math.sin(angle) * 5,
     };
     projectiles.push(
         new Projectile(
@@ -250,20 +284,27 @@ window.addEventListener("click", (e) => {
     );
 });
 
-// To initialize the game:
-function init() {
-    player = new Player(canvas.width / 2, canvas.height / 2, 15, "white");
-    projectiles = [];
-    enemies = [];
-    particles = [];
-}
-
 // If button is clicked, the game starts.
 button.addEventListener("click", () => {
-    init();
+    canvas.width = window.innerWidth; // Reset Width
+    canvas.height = window.innerHeight; // Reset Height
+    bigScore.parentNode.classList.toggle("shown");
+
+    // Reset all previous changes.
+    particles = [];
+    enemies = [];
+    projectiles = [];
     score = 0;
-    scoreEl.textContent = score;
-    scoreBoard.classList.toggle("shown");
+    gameSpeed = 0;
+    player.x = canvas.width / 2; // Reset player width
+    player.y = canvas.height / 2; // Reset player height
+    minScore.textContent = score;
+
+    // Get Local storage value.
+    maxScore =
+        localStorage.getItem("maxScore") != "0"
+            ? localStorage.getItem("maxScore")
+            : 0;
+    highScore.textContent = maxScore;
     animate();
-    spawnEnemy();
 });
