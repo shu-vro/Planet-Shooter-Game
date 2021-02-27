@@ -8,20 +8,29 @@
         <meta name="description" content="Your Description..." />
         <title>Document</title>
         <link rel="stylesheet" href="resources/css/style.css" />
-        <link rel="shortcut icon" href="resources/img/favicon.ico" type="image/x-icon" />
+        <link
+            rel="shortcut icon"
+            href="resources/img/favicon.ico"
+            type="image/x-icon"
+        />
     </head>
     <body>
-        <div class="miniScore">
-            <span>Score: </span>
-            <span id="score">0</span>
+        <canvas id="canvas"></canvas>
+        <div class="minScore">
+            <div>
+                <span>Score</span>
+                <span id="minScore">0</span>
+            </div>
+            <div>
+                <span>High Score</span>
+                <span id="highScore">0</span>
+            </div>
         </div>
-
-        <div class="scoreBoard shown">
-            <h1 id="finalScore">0</h1>
-            <p>Scores</p>
+        <div class="bigScore shown">
+            <h1 id="bigScore">0</h1>
+            <p>Point(s)</p>
             <button>Play</button>
         </div>
-        <canvas id="canvas"></canvas>
         <script src="resources/js/main.js"></script>
     </body>
 </html>
